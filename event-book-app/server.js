@@ -36,7 +36,11 @@ const schema = buildSchema(`
 
 const rootValue = {
   events: () => {
-    return events;
+    return Event.find().then(events => {
+        return events.map(event => {
+            return {...event._doc}
+        })
+    }).catch(err => console.log(err))
   },
   createEvent: (args) => {
     const event = new Event({
@@ -55,12 +59,12 @@ const rootValue = {
           title: result.title,
           description: result.description,
           price: result.price,
-          date: result.date.toISOString(), // Adjust the date formatting if needed
+          date: result.date.toISOString(), 
         };
       })
       .catch((err) => {
         console.error(err);
-        throw err; // Make sure to throw the error to indicate a failed mutation
+        throw err; 
       });
   },
   
