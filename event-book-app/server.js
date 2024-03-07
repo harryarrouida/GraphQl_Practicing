@@ -1,41 +1,65 @@
-const express = require("express")
-const bodyParser = require("body-parser")
-const {graphqlHTTP} = require("express-graphql")
+const express = require("express");
+const bodyParser = require("body-parser");
+const { graphqlHTTP } = require("express-graphql");
 
-const {buildSchema} = require("graphql")
+const { buildSchema } = require("graphql");
 
-const app = express()
-const port = 5000
+const app = express();
+const port = 5000;
 
-app.use(bodyParser.json())
+app.use(bodyParser.json());
 
-const events = ["all-night coding", "all-day coding", "all-week coding"]
+const events = [];
 
 const schema = buildSchema(`
+    type Event {
+        _id: ID!
+        title: String!
+        description: String!
+        price: Float!
+        date: String!
+    }
+
+    input EventInput {
+         title: String!
+         description: String!
+         price: Float!
+         date: String!
+    }
+
     type Query {
         events: [String!]!
     }
     type Mutation {
-        createEvent(name: String): String
+        createEvent(eventInput: EventInput!): String
     }
-`)
+`);
 
 const rootValue = {
-    events: () => {
-        return events
-    },
-    createEvent: ({name}) => {
-        events.push(name)
-        return name
+  events: () => {
+    return events;
+  },
+  createEvent: (args) => {
+    const event = {
+        _id: Math.random().toString(),
+        title: args.title,
+        description: args.description,
+        price: +args.price,
+        date: new Date().toISOString()
     }
-}
+    events.push(event)
+  },
+};
 
-app.use("/graphql", graphqlHTTP({
+app.use(
+  "/graphql",
+  graphqlHTTP({
     schema: schema,
     rootValue: rootValue,
-    graphiql: true
-}))
+    graphiql: true,
+  })
+);
 
 app.listen(port, () => {
-    console.log("server is running")
-})
+  console.log("server is running");
+});
