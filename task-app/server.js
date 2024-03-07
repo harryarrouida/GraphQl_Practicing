@@ -1,7 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const { graphqlHTTP } = require("express-graphql");
-const { buildSchema } = require("graphql");
+const { buildSchema, graphql } = require("graphql");
 
 const bodyParser = require("body-parser");
 
@@ -10,9 +10,14 @@ const port = 4000;
 
 app.use(bodyParser.json());
 
-const Task = require("./models/task");
+const resolvers = require("./graphql/resolvers")
+const schema = buildSchema(require("fs").readFileSync("./graphql/schema.gql", "utf-8"))
 
-
+app.use("/graphql", graphqlHTTP({
+    schema: schema,
+    rootValue: resolvers,
+    graphiql: true
+}))
 
 mongoose
   .connect(
