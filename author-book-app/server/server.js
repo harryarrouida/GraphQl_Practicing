@@ -13,7 +13,7 @@ app.use(cors())
 const typeDefs = require("./graphql/typeDefs")
 const resolvers = require("./graphql/resolvers")
 
-const server = new ApolloServer({typeDefs, resolvers})
+const server = new ApolloServer({typeDefs, resolvers, debug: true})
 
 mongoose.connect("mongodb+srv://hamzaarr84:graphql@cluster0.ct6h1y3.mongodb.net/author-book-app")
 .then(async () => {

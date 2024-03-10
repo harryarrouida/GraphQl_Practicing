@@ -8,7 +8,7 @@ const bookModel = new Schema({
     description: {
         type: String, required: true
     },
-    authorId: {
+    author: {
         type: mongoose.Types.ObjectId,
         required: true,
         ref: "Author"

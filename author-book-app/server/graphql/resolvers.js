@@ -44,7 +44,7 @@ const resolvers = {
         const newBook = new Book({
             title: args.input.title,
             description: args.input.description,
-            authorId: args.input.authorId 
+            author: args.input.author 
         })
         try {
             const result = await newBook.save()

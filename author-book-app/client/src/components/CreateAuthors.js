@@ -4,11 +4,13 @@ import { gql, useMutation } from "@apollo/client";
 
 const CREATE_AUTHOR = gql`
   mutation createAuthor($input: AuthorInput!) {
-    AddAuthor(input: $input) {
+    createAuthor(input: $input) {
+      _id
       name
     }
   }
 `;
+
 
 export default function CreateAuthors() {
   const [nameInp, setName] = useState("");
@@ -25,14 +27,12 @@ export default function CreateAuthors() {
     try {
       const result = await createAuthor({
         variables: {
-          input: { name: nameInp.toString() },
+          input: { name: nameInp },
         },  
       });
       console.log("Author added successfully:", result);
-      console.log(nameInp);
     } catch (error) {
       console.log("Error creating author:", error);
-      console.log(nameInp);
     }
     setName("");
   };
