@@ -18,6 +18,7 @@ const server = new ApolloServer({typeDefs, resolvers})
 mongoose.connect("mongodb+srv://hamzaarr84:graphql@cluster0.ct6h1y3.mongodb.net/author-book-app")
 .then(async () => {
     await server.start()
+    server.applyMiddleware({app, path: "/graphql"})
     app.listen(port, () => console.log("server is running"))
 })
 .catch(err => console.log('connection failed: ', err))
