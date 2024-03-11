@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import React from "react";
 import { gql, useMutation, useQuery } from "@apollo/client";
 
@@ -19,7 +19,6 @@ const GET_AUTHORS = gql`
     }
   }
 `;
-
 export default function CreateBooks() {
   const [formData, setFormData] = useState({
     title: "",
@@ -32,19 +31,37 @@ export default function CreateBooks() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-    console.log(formData);
+
+    if (name === "authorSelected") {
+      const selectedAuthor = data.authors.find(
+        (author) => author._id === value
+      );
+      setFormData((prevData) => ({
+        ...prevData,
+        author: selectedAuthor || "", // Set author to empty string if no match found
+      }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
+
+    console.log("formData:", formData);
   };
+
+  console.log(formData);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const result = await createBooks({
         variables: {
-          input: formData,
+          input: {
+            title: formData.title,
+            description: formData.description,
+            authorId: formData.author._id, // Pass only the _id of the author
+          },
         },
       });
       console.log("Book added successfully:", result);
@@ -52,7 +69,7 @@ export default function CreateBooks() {
       console.error("Error creating the book:", error);
     }
   };
-  
+
   if (loading) return <p>loading...</p>;
   if (error) return <p>{error.message}</p>;
 
@@ -62,14 +79,12 @@ export default function CreateBooks() {
       <form onSubmit={handleSubmit}>
         <input type="text" name="title" onChange={handleChange}></input>
         <input type="text" name="description" onChange={handleChange}></input>
-        <select name="author" onChange={handleChange}>
-          {data.authors.map((author) => {
-            return (
-              <option key={author._id} value={author._id}>
-                {author.name}
-              </option>
-            );
-          })}
+        <select name="authorSelected" onChange={handleChange}>
+          {data.authors.map((author) => (
+            <option key={author._id} value={author._id}>
+              {author.name}
+            </option>
+          ))}
         </select>
         <button type="submit">add</button>
       </form>

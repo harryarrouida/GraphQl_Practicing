@@ -28,34 +28,55 @@ const resolvers = {
   },
   Mutation: {
     createAuthor: async (parent, args) => {
-        const newAuthor = new Author({
-            name: args.input.name
-        })
-        try {
-           const result = await newAuthor.save()
-           return {
-            ...result._doc, _id: result._id.toString()
-           }
-        } catch (error) {
-            console.log("error saving author: ", error)
-        }
+      const newAuthor = new Author({
+        name: args.authorInput.name,
+      });
+      try {
+        const result = await newAuthor.save();
+        return {
+          ...result._doc,
+          _id: result._id.toString(),
+        };
+      } catch (error) {
+        console.log("error saving author: ", error);
+      }
     },
     createBook: async (parent, args) => {
-        const newBook = new Book({
-            title: args.input.title,
-            description: args.input.description,
-            author: args.input.author 
-        })
-        try {
-            const result = await newBook.save()
-            return {
-                ...result._doc, id: result._id.toString()
-            }
-        } catch (error) {
-            console.log('error saving book')
-        }
-    }
+      const newBook = new Book({
+        title: args.input.title,
+        description: args.input.description,
+        author: args.input.author,
+      });
+
+      try {
+        const result = await newBook.save();
+
+        const author = await Author.findById(args.input.author);
+        author.books.push(result._id);
+        await author.save();
+
+        return {
+          ...result._doc,
+          id: result._id.toString(),
+        };
+      } catch (error) {
+        console.log('error saving book', error);
+      }
+    },
+  },
+  Book: {
+    author: async (parent) => {
+      try {
+        const author = await Author.findById(parent.author);
+        return {
+          ...author._doc,
+          _id: author._id.toString(),
+        };
+      } catch (error) {
+        console.log("error fetching book author: ", error);
+      }
+    },
   },
 };
 
-module.exports = resolvers
+module.exports = resolvers;

@@ -9,10 +9,9 @@ const bookModel = new Schema({
         type: String, required: true
     },
     author: {
-        type: mongoose.Types.ObjectId,
-        required: true,
+        type: Schema.Types.ObjectId,
         ref: "Author"
     }
 })
 
-module.exports = new mongoose.model("Book", bookModel)
+module.exports = mongoose.model("Book", bookModel)
